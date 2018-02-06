@@ -74,7 +74,8 @@ class hackTickets(object):
 
         # 席别
         seat_type = cp.get("confirmInfo", "seat_type")
-        self.seatType = self.seatMap[seat_type] if seat_type in self.seatMap else ""
+        # self.seatType = self.seatMap[seat_type] if seat_type in self.seatMap else ""
+        self.seatType = seat_type
 
         # 是否允许分配无座
         noseat_allow = cp.get("confirmInfo", "noseat_allow")
@@ -224,9 +225,10 @@ class hackTickets(object):
 
             try:
                 for i in self.driver.find_by_text(u"预订"):
-                    i.click()
-                    # 等待0.3秒，提交等待的时间
-                    sleep(0.3)
+                    if i._element.tag_name == 'a':  # 如果是预订链接（可预订）
+                        i.click()
+                        # 等待0.3秒，提交等待的时间
+                        sleep(0.3)
 
             except Exception as e:
                 print(e)
@@ -241,7 +243,8 @@ class hackTickets(object):
     def confirmOrder(self):
         print(u"选择席别...")
         if self.seatType:
-            self.driver.find_by_value(self.seatType).click()
+            for option in self.driver.find_option_by_text(self.seatType + "（"):
+                option.last.click()
         else:
             print(u"未指定席别，按照12306默认席别")
 
